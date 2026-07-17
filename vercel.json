@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:match*",
+      "destination": "https://agp-tracker-3d.onrender.com/api/:match*"
+    }
+  ]
+}
