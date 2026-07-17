@@ -9,7 +9,7 @@
     "dev": "node --watch --no-network-family-autoselection src/server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": "22.x"
   },
   "dependencies": {
     "express": "^4.19.2",
