@@ -1,0 +1,21 @@
+{
+  "name": "agp-tracker",
+  "version": "1.0.0",
+  "description": "Unofficial community tracker for Agent Grand Prix (agp.onlatch.com)",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --no-network-family-autoselection src/server.js",
+    "dev": "node --watch --no-network-family-autoselection src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.3.0",
+    "node-cron": "^3.0.3"
+  },
+  "keywords": ["agp", "agent-grand-prix", "latch", "rialo", "tracker"],
+  "license": "MIT"
+}
