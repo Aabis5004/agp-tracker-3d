@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
 :root{
   --bg:#05070a; --bg2:#080b11; --panel:rgba(255,255,255,.028); --panel2:rgba(255,255,255,.05);
@@ -667,11 +668,31 @@ async function openCard(d){
       <div class="grp">race history</div>
       ${p.history.map(h=>`<div class="hrow" data-r="${esc(h.race)}">
         <span class="${h.finished?'w':''}">${h.finished?'🏁 ':''}${esc(h.race)}</span>
-        <span class="d">${h.points}/${h.pointCount} · ${h.questions}q · $${h.spend.toFixed(2)}</span></div>`).join('')}`;
+        <span class="d">${h.points}/${h.pointCount} · ${h.questions}q · $${h.spend.toFixed(2)}</span></div>`).join('')}
+      <div style="display:flex;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);">
+        <button onclick="downloadCard()" style="background:var(--acid);color:#000;border:none;padding:8px;border-radius:6px;font-family:var(--mono);font-size:10px;font-weight:600;cursor:pointer;flex:1;transition:opacity 0.2s;">DOWNLOAD CARD</button>
+        <button onclick="shareCard('${esc(d.login)}')" style="background:var(--panel2);color:var(--text);border:1px solid var(--line);padding:8px;border-radius:6px;font-family:var(--mono);font-size:10px;font-weight:600;cursor:pointer;flex:1;transition:background 0.2s;">SHARE ON X</button>
+      </div>`;
     $$('#prof .hrow').forEach(el=>el.onclick=()=>{F.race=el.dataset.r;
       $('#tl').classList.add('on'); $('#g-tl').classList.add('on'); applyFilter()});
   }catch{}
 }
+
+window.downloadCard = function() {
+  const card = document.getElementById('card');
+  html2canvas(card, { backgroundColor: '#05070a', scale: 2 }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'agp-racer-card.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+};
+
+window.shareCard = function(login) {
+  const url = `https://twitter.com/intent/tweet?text=Check%20out%20${login}'s%20stats%20on%20the%20Agent%20Grand%20Prix%20Tracker!%20%F0%9F%8F%8E%EF%B8%8F%E2%9C%A8&url=https://agp.onlatch.com`;
+  window.open(url, '_blank');
+};
+
 function closeCard(){ $('#card').classList.remove('on'); GAL&&GAL.clearSelection(); }
 function flyTo(login){ if(!GAL)return; const d=GAL.select(x=>x.login===login); if(d)openCard(d); }
 

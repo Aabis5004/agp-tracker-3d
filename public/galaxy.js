@@ -94,13 +94,13 @@ function buildShell() {
   mg.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   matrix = new THREE.Points(mg, new THREE.PointsMaterial({
     color: 0x3f5b70, size: 0.045, sizeAttenuation: true,
-    transparent: true, opacity: 0.25, depthWrite: false
+    transparent: true, opacity: 0.0, depthWrite: false
   }));
   g.add(matrix);
 
   // graticule
   grat = new THREE.Group();
-  const gm = new THREE.LineBasicMaterial({ color: 0x1f4058, transparent: true, opacity: 0.08 });
+  const gm = new THREE.LineBasicMaterial({ color: 0x1f4058, transparent: true, opacity: 0.0 });
   for (let i = 1; i < 8; i++) {
     const lat = (i / 8) * Math.PI - Math.PI / 2;
     const r = Math.cos(lat) * R * 1.004, y = Math.sin(lat) * R * 1.004;
@@ -215,23 +215,21 @@ function layout(pts) {
   const out = new Map();
   sorted.forEach((d, i) => {
     const dir = fib(i, n);
-    // lift off the surface by points reached
-    const lift = R * (1.035 + (d.pointCount ? d.points / d.pointCount : 0) * 0.16);
+    // lock dots to the surface
+    const lift = R * 1.0;
     out.set(keyOf(d), { dir, pos: dir.clone().multiplyScalar(lift) });
   });
   return out;
 }
 
-const radOf = d => 0.08 + Math.sqrt(d.spend / maxSpend) * 0.25;
+const radOf = d => 0.15;
 
 /* ---------- orbs ---------- */
 function rebuild(count) {
   if (orbs) { globe.remove(orbs); orbs.geometry.dispose(); orbs.material.dispose(); }
   const geo = new THREE.SphereGeometry(1, 32, 24);
-  const mat = new THREE.MeshStandardMaterial({
-    roughness: 0.45, metalness: 0.25,
-    emissive: new THREE.Color(0xffffff), emissiveIntensity: 0.5,
-    transparent: false
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xffffff, transparent: false
   });
   orbs = new THREE.InstancedMesh(geo, mat, Math.max(count, 1));
   orbs.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
@@ -392,7 +390,7 @@ function animate() {
   if (!running) return;
   t += dt;
 
-  if (spin && !drag) rot.y.jump(rot.y.v + dt * 0.085);
+  if (spin && !drag) rot.y.jump(rot.y.v + dt * 0.15);
   globe.rotation.y = rot.y.step(dt);
   globe.rotation.x = rot.x.step(dt);
   camera.position.z = dist.step(dt);
@@ -405,6 +403,9 @@ function animate() {
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
       n.rise.step(dt);
+      
+      // Lock all dots to the surface (no hovering based on points)
+      n.home.copy(n.dir).multiplyScalar(R * 1.0);
       n.pos.copy(n.dir).multiplyScalar(
         R * 0.25 + (n.home.length() - R * 0.25) * n.rise.v
       );
