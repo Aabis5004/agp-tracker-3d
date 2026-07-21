@@ -13,6 +13,15 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+
+// allow the race-feed site (and any origin) to read the API + SSE stream
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static(join(__dirname, '..', 'public')));
